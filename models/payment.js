@@ -5,7 +5,7 @@ var PaymentSchema   = new Schema({
     name	: String,
     price	: Number,
     owner	: String,
-    sharer	: [String],
+    sharers	: [String],
 });
 
-module.exports = mongoose.model('payment', PaymentSchema);
+module.exports = mongoose.model('Payment', PaymentSchema);
