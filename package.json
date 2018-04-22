@@ -2,7 +2,7 @@
   "name": "colok",
   "version": "0.0.1",
   "description": "First try of colok app",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/wpef/colok#readme",
   "dependencies": {
-    "express": "^4.16.3"
+    "body-parser": "~1.0.1",
+    "express": "^4.16.3",
+    "mongoose": "~3.6.13"
   }
 }
