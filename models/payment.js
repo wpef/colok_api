@@ -6,7 +6,8 @@ var PaymentSchema   = new Schema({
     price	: Number,
     owner	: String,
     sharers	: [String],
-    paid	: Boolean, 
+    paid	: { type : Boolean, default : false },
+    debt_added	: { type : Boolean, default : false } 
 });
 
 PaymentSchema.virtual('n').get(function () {

@@ -18,7 +18,9 @@ mongoose.connect(
 	}
 );
 
+//Loading models
 var Payment = require('./models/payment');
+var Debt = require('./models/debt');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -120,7 +122,7 @@ router.route('/payment/:payment_id')
 
 //TRYYYYY
 
-router.route('/payment/:payment_id/calc')
+router.route('/payment/:payment_id/debt')
 
     // get the payment by id (accessed at GET http://localhost:8080/api/payment/:payment_id)
     .get(function(req, res) {
@@ -142,19 +144,70 @@ router.route('/payment/:payment_id/calc')
 
             		total = total - shared; 
 
-            		debt.push({
-            			debt_owner	: s,
-            			debt_price	: shared,
-            			debt_to		: payment.owner,
-            		});
+            		debt.push( new Debt({
+            			from	: s,
+            			price	: shared,
+            			to		: payment.owner,
+            		}));
             	}
             
             });
 
             res.json({ total : payment.price, "Dettes" : debt, reste : total });
-        });
+        
+        x});
     
     })
+
+    .post(function(req, res) {
+
+    	Payment.findById(req.params.payment_id, function(err, payment) {
+            if (err) res.send(err);
+
+            if (payment.debt_added == false) {
+
+	            var total = payment.price;
+	            var shared = total / payment.n;
+
+				var debt = [];
+
+	            payment.sharers.forEach(function (s) {
+
+	            	if (s != payment.owner) {
+
+	            		debt.push( new Debt({
+	            			from	: s,
+	            			price	: shared,
+	            			to		: payment.owner,
+	            		}));
+	            	}
+	            
+	            });
+
+	            debt.forEach(function (d) {
+
+	            	d.save(function(err) {
+						if (err) res.send(err);
+						console.log('Debt sucessfully created!');
+					});
+
+	            });
+
+	            payment.debt_added = true;
+	            payment.save(function(err) {
+	            	if (err) res.send(err);
+					console.log('Payment sucessfully updated!');
+	            });
+
+	            res.json({ Total : payment.price, "Debts created" : debt});
+	        }
+
+	        else
+	        	res.json({ message : 'Debts already posted'});
+
+	     });
+
+    });
 
 
 router.route('/payment/:payment_id/pay') 
