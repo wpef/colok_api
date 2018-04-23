@@ -39,196 +39,32 @@ router.use(function(req, res, next) {
 });
 
 
-// test route to make sure everything is working (accessed at GET http://localhost:8080/api)
+// HOME
 router.get('/', function(req, res) {
 	res.json({ message: 'hooray! welcome to our api!' });   
 });
 
+
+//Load controllers
+var payment = require('./controllers/payment');
+var debt 	= require('./controllers/debt');
+
+
+//Create routes method
 router.route('/payment')
-
-	//get all payments
-	.get(function(req,res) {
-		Payment.find(function(err, payments) {
-			if (err) res.send(err);
-			res.json(payments);
-		});
-
-	})
-	
-	// create a payment (accessed at POST http://localhost:8080/api/payment)
-	.post(function(req, res) {
-
-		var payment 	= new Payment();  // create a new instance of the payment model
-		payment.name	= req.body.name;  // set the payment name (comes from the request)
-		payment.price	= req.body.price;
-		payment.owner	= req.body.owner;
-		payment.sharers	= req.body.sharers;
-		payment.paid 	= false;
-
-
-		// save the payment and check for errors
-		payment.save(function(err) {
-			if (err)
-				res.send(err);
-
-			res.json({ message: 'Payment sucessfully created!' });
-		});
-
-	});
+    .get(payment.list_all)
+    .post(payment.add);
 
 router.route('/payment/:payment_id')
-
-    // get the payment by id (accessed at GET http://localhost:8080/api/payment/:payment_id)
-    .get(function(req, res) {
-        Payment.findById(req.params.payment_id, function(err, payment) {
-            if (err) res.send(err);
-            res.json({ payment : payment , effectif : payment.n });
-        });
-    })
-
-    .put(function(req, res){
-		Payment.findById(req.params.payment_id, function(err, payment) {
-            if (err) res.send(err);
-
-            var body = req.body;
-
-            payment.name = body.name ? body.name : payment.name;
-            payment.price = body.price ? body.price : payment.price;
-            payment.owner = body.owner ? body.owner : payment.owner;
-            payment.sharers = body.sharers ? body.sharers : payment.sharers;
-
-            payment.save(function (err) {
-            	if (err) res.send(err);
-
-            	res.json({
-            		payment_id: payment._id,
-            		payment_name : payment.name,
-            		message: 'Payment sucessfully updated!' });
-
-            });
-        });
-	})
-
-	.delete(function(req, res) {
-        Payment.remove({
-            _id: req.params.payment_id
-        }, function(err, payment) {
-            if (err)
-                res.send(err);
-
-            res.json({ message: 'Payment sucessfully deleted!' });
-        });
-    });
-
-//TRYYYYY
+    .get(payment.getBy_id)
+    .put(payment.update)
+    .delete(payment.delete);
 
 router.route('/payment/:payment_id/debt')
+	.get(payment.calc_debt);
 
-    // get the payment by id (accessed at GET http://localhost:8080/api/payment/:payment_id)
-    .get(function(req, res) {
-
-        Payment.findById(req.params.payment_id, function(err, payment) {
-            if (err) res.send(err);
-
-            var total = payment.price;
-            var shared = total / payment.n;
-
-			var debt = [];
-
-            payment.sharers.forEach(function (s) {
-
-            	if (s == payment.owner) {
-            		total = total - shared; 
-            	}
-            	else {
-
-            		total = total - shared; 
-
-            		debt.push( new Debt({
-            			from	: s,
-            			price	: shared,
-            			to		: payment.owner,
-            		}));
-            	}
-            
-            });
-
-            res.json({ total : payment.price, "Dettes" : debt, reste : total });
-        
-        x});
-    
-    })
-
-    .post(function(req, res) {
-
-    	Payment.findById(req.params.payment_id, function(err, payment) {
-            if (err) res.send(err);
-
-            if (payment.debt_added == false) {
-
-	            var total = payment.price;
-	            var shared = total / payment.n;
-
-				var debt = [];
-
-	            payment.sharers.forEach(function (s) {
-
-	            	if (s != payment.owner) {
-
-	            		debt.push( new Debt({
-	            			from	: s,
-	            			price	: shared,
-	            			to		: payment.owner,
-	            		}));
-	            	}
-	            
-	            });
-
-	            debt.forEach(function (d) {
-
-	            	d.save(function(err) {
-						if (err) res.send(err);
-						console.log('Debt sucessfully created!');
-					});
-
-	            });
-
-	            payment.debt_added = true;
-	            payment.save(function(err) {
-	            	if (err) res.send(err);
-					console.log('Payment sucessfully updated!');
-	            });
-
-	            res.json({ Total : payment.price, "Debts created" : debt});
-	        }
-
-	        else
-	        	res.json({ message : 'Debts already posted'});
-
-	     });
-
-    });
-
-
-router.route('/payment/:payment_id/pay') 
-
-	.put(function(req, res){
-		Payment.findById(req.params.payment_id, function(err, payment) {
-            if (err) res.send(err);
-            
-            payment.paid = true;
-
-            payment.save(function (err) {
-            	if (err) res.send(err);
-
-            	res.json({
-            		payment_id: payment._id,
-            		payment_name : payment.name,
-            		message: 'Payment sucessfully paid!' });
-
-            });
-        });
-	});
+router.route('/debt/:payment_id/add')
+    .post(debt.add);
 
 // REGISTER OUR ROUTES -------------------------------
 // all of our routes will be prefixed with /api
