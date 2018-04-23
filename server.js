@@ -69,6 +69,9 @@ router.route('/debt/:payment_id/add')
 // REGISTER OUR ROUTES -------------------------------
 // all of our routes will be prefixed with /api
 app.use('/api', router);
+app.use( (req, res) => {
+  res.status(404).send({message: req.originalUrl + ' not found'})
+});
 
 // START THE SERVER
 // =============================================================================
