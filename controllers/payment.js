@@ -26,7 +26,8 @@ exports.add = function(req,res) {
 
 	// save the payment and check for errors
 	payment.save(function(err) {
-		if (err) res.status(400).send(err);
+		if (err)
+			res.status(400).send(err);
 		else
 			res.json({ message: 'Payment sucessfully created!' });
 	});
@@ -37,7 +38,8 @@ exports.add = function(req,res) {
 exports.getBy_id = function(req, res) {
 	Payment.findById(req.params.payment_id, function(err, payment) {
 		if (err) res.status(400).send(err);
-		res.json({ payment : payment , effectif : payment.n });
+		else if (!payment) res.status(400).send(message : 'Payment not found');
+		else res.json({ payment : payment , effectif : payment.n });
 	});
 };
 
