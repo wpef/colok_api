@@ -31,7 +31,6 @@ var port = process.env.PORT || 8080;        // set our port
 
 // ROUTES FOR OUR API
 // =============================================================================
-var router = express.Router();              // get an instance of the express Router
 
 // HOME
 router.get('/', function(req, res) {
@@ -39,30 +38,15 @@ router.get('/', function(req, res) {
 });
 
 
-//Load controllers
-var payment = require('./controllers/payment');
-var debt 	= require('./controllers/debt');
-
-
-//Create routes method
-router.route('/payment')
-    .get(payment.list_all)
-    .post(payment.add);
-
-router.route('/payment/:payment_id')
-    .get(payment.getBy_id)
-    .put(payment.update)
-    .delete(payment.delete);
-
-router.route('/payment/:payment_id/debt')
-	.get(payment.calc_debt);
-
-router.route('/debt/:payment_id/add')
-    .post(debt.add);
+//Load routes
+var paymentRoutes = require('./routes/payment');
+var debtRoutes 	= require('./routes/debt');
 
 // REGISTER OUR ROUTES -------------------------------
+
 // all of our routes will be prefixed with /api
-app.use('/api', router);
+app.use('/api/payment', paymentRoutes);
+app.use('/api/debt', paymentRoutes);
 app.use( (req, res) => {
   res.status(404).send({message: req.originalUrl + ' not found'})
 });
