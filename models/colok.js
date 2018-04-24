@@ -10,11 +10,11 @@ var ColokSchema   = new Schema({
     paid	: { type : Boolean, default : false }
 });
 
-ColokSchema.methods.getDebtsTotal = function() {
+ColokSchema.methods.getDebts = function() {
 	var total = 0;
-	
-	debts.forEach( function (d) {
-		total = total + d.price;
+
+	debts.forEach( function (debt) {
+		total = total + debt.price;
 	});
 
 	return total;
