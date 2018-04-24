@@ -32,21 +32,16 @@ var port = process.env.PORT || 8080;        // set our port
 // ROUTES FOR OUR API
 // =============================================================================
 
-// HOME
-router.get('/', function(req, res) {
-	res.json({ message: 'hooray! welcome to our api!' });   
-});
-
 
 //Load routes
-var paymentRoutes = require('./routes/payment');
-var debtRoutes 	= require('./routes/debt');
+var paymentsRoutes = require('./routes/payments');
+var debtsRoutes 	= require('./routes/debts');
 
 // REGISTER OUR ROUTES -------------------------------
 
 // all of our routes will be prefixed with /api
-app.use('/api/payment', paymentRoutes);
-app.use('/api/debt', paymentRoutes);
+app.use('/api/payments', paymentsRoutes);
+app.use('/api/debts', debtsRoutes);
 app.use( (req, res) => {
   res.status(404).send({message: req.originalUrl + ' not found'})
 });
