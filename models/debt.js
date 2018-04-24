@@ -2,9 +2,9 @@ var mongoose     = require('mongoose');
 var Schema       = mongoose.Schema;
 
 var DebtSchema   = new Schema({
-    from	: {type : String, required : true},
+    from	: {type : [Schema.Types.ObjectId], required : true},
     price	: {type : Number, required : true},
-    to		: {type : String, required : true},
+    to		: {type : [Schema.Types.ObjectId], required : true},
     paid	: { type : Boolean, default : false }
 });
 
