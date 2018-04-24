@@ -26,9 +26,9 @@ exports.add = function(req,res) {
 
 	// save the payment and check for errors
 	payment.save(function(err) {
-		if (err) res.send(err);
-
-		res.json({ message: 'Payment sucessfully created!' });
+		if (err) res.status(400).send(err);
+		else
+			res.json({ message: 'Payment sucessfully created!' });
 	});
 
 };
@@ -36,7 +36,7 @@ exports.add = function(req,res) {
 //GET 'api/payment/:payment_id'
 exports.getBy_id = function(req, res) {
 	Payment.findById(req.params.payment_id, function(err, payment) {
-		if (err) res.send(err);
+		if (err) res.status(400).send(err);
 		res.json({ payment : payment , effectif : payment.n });
 	});
 };
@@ -57,12 +57,13 @@ exports.update = function(req, res) {
 		payment.sharers = body.sharers ? body.sharers : payment.sharers;
 
 		payment.save(function (err) {
-			if (err) res.send(err);
-
-			res.json({
-				payment_id: payment._id,
-				payment_name : payment.name,
-				message: 'Payment sucessfully updated!' });
+			if (err)
+				res.send(err);
+			else
+				res.json({
+					payment_id: payment._id,
+					payment_name : payment.name,
+					message: 'Payment sucessfully updated!' });
 
 		});
 	});
@@ -74,9 +75,10 @@ exports.update = function(req, res) {
 exports.delete = function(req, res) {
 	Payment.remove({ _id: req.params.payment_id }, function(err, payment) {
 		
-		if (err)res.send(err);
-
-		res.json({ message: 'Payment sucessfully deleted!' });
+		if (err)
+			res.status(400).send(err);
+		else
+			res.json({ message: 'Payment sucessfully deleted!' });
 	});
 };
 
@@ -85,32 +87,40 @@ exports.delete = function(req, res) {
 exports.calc_debt = function(req, res) {
 
 	Payment.findById(req.params.payment_id, function(err, payment) {
-		if (err) res.send(err);
+		if (err) 
+			res.status(400).send(err);
 
-		var total = payment.price;
-		var shared = total / payment.n;
+		else if (!payment)
+			res.status(404).send({message : 'Payment not found'});
 
-		var debt = [];
+		else if (payment) {
 
-		payment.sharers.forEach(function (s) {
+			var total = payment.price;
+			var shared = total / payment.n;
 
-			if (s == payment.owner) {
-				total = total - shared; 
-			}
-			else {
+			var debt = [];
 
-				total = total - shared; 
+			payment.sharers.forEach(function (s) {
 
-				debt.push( new Debt({
-					from	: s,
-					price	: shared,
-					to		: payment.owner,
-				}));
-			}
+				if (s == payment.owner) {
+					total = total - shared; 
+				}
+				else {
 
-		});
+					total = total - shared; 
 
-		res.json({ total : payment.price, "Dettes" : debt, reste : total });
+					debt.push( new Debt({
+						from	: s,
+						price	: shared,
+						to		: payment.owner,
+					}));
+				}
+
+			});
+
+			res.json({ total : payment.price, "Dettes" : debt, reste : total });
+
+		}
 
 	});
 

@@ -2,10 +2,10 @@ var mongoose     = require('mongoose');
 var Schema       = mongoose.Schema;
 
 var PaymentSchema   = new Schema({
-    name	: String,
-    price	: Number,
-    owner	: String,
-    sharers	: [String],
+    name	: {type : String, required : true},
+    price	: {type : Number, required : true},
+    owner	: {type : String, required : true},
+    sharers	: {type : [String], required : true },
     paid	: { type : Boolean, default : false },
     debt_added	: { type : Boolean, default : false } 
 });
