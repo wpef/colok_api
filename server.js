@@ -15,7 +15,6 @@ mongoose.connect(
     'mongodb://colok:mal128@ds255329.mlab.com:55329/colok_user',
 	function(error){
 		if(error) console.log(error);
-        console.log("connection successful");
 	}
 );
 
@@ -54,4 +53,4 @@ app.use( (req, res) => {
 // START THE SERVER
 // =============================================================================
 app.listen(port);
-console.log('Magic happens on port ' + port);
+console.log('\nMagic happens on port ' + port + '\n');
