@@ -4,8 +4,8 @@ var Schema       = mongoose.Schema;
 var PaymentSchema   = new Schema({
     name	: {type : String, required : true},
     price	: {type : Number, min : 0, required : true},
-    owner	: {type : Schema.Types.ObjectId, required : true},
-    sharers	: {type : [Schema.Types.ObjectId], required : true },
+    owner	: {type : Schema.Types.ObjectId, ref : 'Colok', required : true},
+    sharers	: [{type : Schema.Types.ObjectId, ref : 'Colok', required : true }],
     paid	: { type : Boolean, default : false },
     debt_added	: { type : Boolean, default : false } 
 });

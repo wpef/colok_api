@@ -5,8 +5,8 @@ var PaymentSchema = require('./payment');
 
 var ColokSchema   = new Schema({
     name	: { type : String, unique : true, required : true },
-    debts	: [Schema.Types.ObjectId],
-    payments : [Schema.Types.ObjectId],
+    debts	: [{ type : Schema.Types.ObjectId, ref : 'Debt' }],
+    payments : [{ type : Schema.Types.ObjectId, ref : 'Payment' }],
 });
 
 ColokSchema.methods.getDebts = function() {

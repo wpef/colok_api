@@ -20,8 +20,8 @@ exports.add = function(req,res) {
 
 	var colok 		= new Colok();
 		colok.name	= req.body.name;
-		colok.debts	= []; //TODO
-		colok.payments	= []; //TODO
+		colok.debts	= [];
+		colok.payments	= [];
 
 
 	// save the colok and check for errors
@@ -35,10 +35,15 @@ exports.add = function(req,res) {
 
 //GET '/coloks/:colok_id'
 exports.getBy_id = function(req, res) {
-	Colok.findById(req.params.colok_id, function(err, colok) {
+	Colok
+	.findById(req.params.colok_id, function(err, colok) {
 		if (err) res.status(400).send(err);
 		else if (!colok) res.status(404).send({message : 'Colok not found'});
-		else res.json({ colok : colok });
+	})
+	.populate('debts').populate('payments').exec(function (err, populated) {
+		if (err) res.send(err);
+		else
+			res.json({ colok : populated });
 	});
 };
 

@@ -20,7 +20,7 @@ exports.add = function(req,res) {
 		payment.name	= req.body.name;
 		payment.price	= req.body.price;
 		payment.owner	= req.body.owner;
-		payment.sharers	= req.body.sharers;
+		payment.sharers	= req.body.sharers.split(',');
 		payment.paid 	= false;
 
 
@@ -35,10 +35,13 @@ exports.add = function(req,res) {
 
 //GET 'api/payment/:payment_id'
 exports.getBy_id = function(req, res) {
-	Payment.findById(req.params.payment_id, function(err, payment) {
+	Payment
+	.findById(req.params.payment_id, function(err, payment) {
 		if (err) res.status(400).send(err);
 		else if (!payment) res.status(404).send({message : 'Payment not found'});
-		else res.json({ payment : payment , effectif : payment.n });
+	})
+	.populate('owner').populate('sharers').exec(function(err, populated) {
+		res.json({ payment : populated , effectif : populated.n });
 	});
 };
 

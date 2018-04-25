@@ -35,10 +35,15 @@ exports.add = function(req,res) {
 
 //GET '/debts/:debt_id'
 exports.getBy_id = function(req, res) {
-	Debt.findById(req.params.debt_id, function(err, debt) {
+	Debt
+	.findById(req.params.debt_id, function(err, debt) {
 		if (err) res.status(400).send(err);
 		else if (!debt) res.status(404).send({message : 'Debt not found'});
-		else res.json({ debt : debt });
+	})
+	.populate('from').populate('to').exec(function (err, populated) {
+		if (err) res.send(err);
+		else
+			res.json({ debt : populated });
 	});
 };
 
