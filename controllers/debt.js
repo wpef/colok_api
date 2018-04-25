@@ -1,5 +1,6 @@
 var Payment = require('../models/payment');
 var Debt	= require('../models/debt');
+var Colok	= require("../models/colok");
 
 
 //GET '/debts/'
@@ -18,11 +19,21 @@ exports.list_all = function(req,res) {
 exports.add = function(req,res) {
 
 	var debt 		= new Debt();
-		debt.from	= req.body.from;
 		debt.price	= req.body.price;
-		debt.to		= req.body.to;
 		debt.paid 	= false;
 
+	var from = Colok.findById(req.body.from, function (err, from) {
+		if (err) res.status(400).send(err);
+		else return from;
+	});
+
+	var to = Colok.findById(req.body.to, function (err, to) {
+		if (err) res.status(400).send(err);
+		else return to;
+	});
+
+	debt.from = from;
+	debt.to = to;
 
 	// save the debt and check for errors
 	debt.save(function(err, saved) {
