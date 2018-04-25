@@ -42,6 +42,7 @@ var debtsRoutes 	= require('./routes/debts');
 // all of our routes will be prefixed with /api
 app.use('/api/payments', paymentsRoutes);
 app.use('/api/debts', debtsRoutes);
+
 app.use( (req, res) => {
   res.status(404).send({message: req.originalUrl + ' not found'})
 });

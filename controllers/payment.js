@@ -12,7 +12,7 @@ exports.list_all = function(req,res) {
 	});
 };
 
-//POST 'api/payment'
+//POST 'api/payments'
 //Used to add a payment to the DB
 exports.add = function(req,res) {
 
@@ -31,14 +31,13 @@ exports.add = function(req,res) {
 		else
 			res.json({ message: 'Payment sucessfully created!' });
 	});
-
 };
 
 //GET 'api/payment/:payment_id'
 exports.getBy_id = function(req, res) {
 	Payment.findById(req.params.payment_id, function(err, payment) {
 		if (err) res.status(400).send(err);
-		else if (!payment) res.status(400).send({message : 'Payment not found'});
+		else if (!payment) res.status(404).send({message : 'Payment not found'});
 		else res.json({ payment : payment , effectif : payment.n });
 	});
 };
@@ -69,7 +68,6 @@ exports.update = function(req, res) {
 
 		});
 	});
-
 };
 
 //DELETE '/payment/:payment_id'
@@ -85,7 +83,7 @@ exports.delete = function(req, res) {
 };
 
 //GET '/payment/:payment_id/debt'
-//Used to calculate each colok debt from a payment (does not store the debt)
+//Used to calculate the debts  from a payment (does not store the debt)
 exports.calc_debt = function(req, res) {
 
 	Payment.findById(req.params.payment_id, function(err, payment) {
@@ -125,5 +123,4 @@ exports.calc_debt = function(req, res) {
 		}
 
 	});
-
 };
