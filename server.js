@@ -12,6 +12,7 @@ var mongoose	= require('mongoose');
 //Setting up mogoDB
 mongoose.connect(
 	'mongodb://colok:mal128@ds155299.mlab.com:55299/colok',
+    //'mongodb://colok:mal128@ds255329.mlab.com:55329/colok_user'
 	function(error){
 		if(error) console.log(error);
         console.log("connection successful");
@@ -42,6 +43,8 @@ var debtsRoutes 	= require('./routes/debts');
 // all of our routes will be prefixed with /api
 app.use('/api/payments', paymentsRoutes);
 app.use('/api/debts', debtsRoutes);
+app.use('/api/coloks', debtsRoutes);
+
 
 app.use( (req, res) => {
   res.status(404).send({message: req.originalUrl + ' not found'})
