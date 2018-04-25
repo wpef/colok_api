@@ -4,7 +4,7 @@ var DebtSchema	= require('./debt');
 var PaymentSchema = require('./payment');
 
 var ColokSchema   = new Schema({
-    name	: { type : String, unique : true, required : true }
+    name	: { type : String, unique : true, required : true },
     debts	: [Schema.Types.ObjectId],
     payments : [Schema.Types.ObjectId],
 });

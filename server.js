@@ -11,8 +11,8 @@ var mongoose	= require('mongoose');
 
 //Setting up mogoDB
 mongoose.connect(
-	'mongodb://colok:mal128@ds155299.mlab.com:55299/colok',
-    //'mongodb://colok:mal128@ds255329.mlab.com:55329/colok_user'
+	//'mongodb://colok:mal128@ds155299.mlab.com:55299/colok',
+    'mongodb://colok:mal128@ds255329.mlab.com:55329/colok_user',
 	function(error){
 		if(error) console.log(error);
         console.log("connection successful");
@@ -35,15 +35,16 @@ var port = process.env.PORT || 8080;        // set our port
 
 
 //Load routes
-var paymentsRoutes = require('./routes/payments');
+var paymentsRoutes  = require('./routes/payments');
 var debtsRoutes 	= require('./routes/debts');
+var coloksRoutes    = require('./routes/coloks');
 
 // REGISTER OUR ROUTES -------------------------------
 
 // all of our routes will be prefixed with /api
 app.use('/api/payments', paymentsRoutes);
 app.use('/api/debts', debtsRoutes);
-app.use('/api/coloks', debtsRoutes);
+app.use('/api/coloks', coloksRoutes);
 
 
 app.use( (req, res) => {
