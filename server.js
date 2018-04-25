@@ -8,6 +8,7 @@ var express		= require('express');        // call express
 var app 		= express();                 // define our app using express
 var bodyParser 	= require('body-parser');
 var mongoose	= require('mongoose');	
+var morgan		= require('morgan');
 
 //Setting up mogoDB
 mongoose.connect(
@@ -24,8 +25,7 @@ var Debt = require('./models/debt');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
-
+app.use(morgan('dev'));
 
 var port = process.env.PORT || 8080;        // set our port
 
@@ -46,8 +46,19 @@ app.use('/api/debts', debtsRoutes);
 app.use('/api/coloks', coloksRoutes);
 
 
-app.use( (req, res) => {
-  res.status(404).send({message: req.originalUrl + ' not found'})
+app.use( (req, res, next) => {
+	const error = new Error('Not found');
+	error.status(404);
+	next(error);
+});
+
+app.use((error, req, res, next) => {
+	res.status(err.status || 500);
+	res.json({
+		error: {
+			message : error.message
+		}
+	});
 });
 
 // START THE SERVER

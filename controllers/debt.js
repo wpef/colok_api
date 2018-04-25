@@ -23,6 +23,7 @@ exports.add = function(req,res) {
 		debt.to		= req.body.to;
 		debt.paid 	= false;
 
+
 	// save the debt and check for errors
 	debt.save(function(err, saved) {
 		if (err)
