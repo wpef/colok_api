@@ -15,7 +15,7 @@ exports.list_all = function(req,res) {
 
 //POST '/debts'
 //Used to add a debt to the DB
-exports.add = function(req,res) {
+exports.add = function(req,res, next) {
 
 	var debt 		= new Debt();
 		debt.from	= req.body.from;
@@ -26,8 +26,8 @@ exports.add = function(req,res) {
 
 	// save the debt and check for errors
 	debt.save(function(err, saved) {
-		if (err)
-			res.status(400).send(err);
+		if (err) next(err);
+	//		res.status(400).send(err);
 		else
 			res.json({ debt : saved, message: 'Debt sucessfully created!' });
 	});
