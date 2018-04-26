@@ -4,10 +4,10 @@ var Debt	= require('../models/debt');
 
 //GET '/debts/'
 //Used to list all debts
-exports.list_all = function(req,res) {
+exports.list_all = function(req,res, next) {
 
 	Debt.find(function(err, debts) {
-			if (err) res.send(err);
+			if (err) next(err);
 			
 			res.json(debts);
 	});
@@ -27,32 +27,31 @@ exports.add = function(req,res, next) {
 	// save the debt and check for errors
 	debt.save(function(err, saved) {
 		if (err) next(err);
-	//		res.status(400).send(err);
-		else
-			res.json({ debt : saved, message: 'Debt sucessfully created!' });
+		
+		res.json({ debt : saved, message: 'Debt sucessfully created!' });
 	});
 };
 
 //GET '/debts/:debt_id'
-exports.getBy_id = function(req, res) {
+exports.getBy_id = function(req, res, next) {
 	Debt
 	.findById(req.params.debt_id, function(err, debt) {
-		if (err) res.status(400).send(err);
-		else if (!debt) res.status(404).send({message : 'Debt not found'});
+		if (err) next(err);
+		if (!debt) next({ status : 404, message : 'Debt not found' });
 	})
 	.populate('from').populate('to').exec(function (err, populated) {
-		if (err) res.send(err);
-		else
-			res.json({ debt : populated });
+		if (err) next(err);
+		
+		res.json({ debt : populated });
 	});
 };
 
 //PUT '/debts/:debt_id'
 //Used to update a debt
-exports.update = function(req, res) {
+exports.update = function(req, res, next) {
 
 	Debt.findById(req.params.debt_id, function(err, debt) {
-		if (err) res.send(err);
+		if (err) next(err);
 
 		var body = req.body;
 
@@ -62,10 +61,9 @@ exports.update = function(req, res) {
 		debt.paid = body.paid ? body.paid : debt.paid;
 
 		debt.save(function (err, saved) {
-			if (err)
-				res.send(err);
-			else
-				res.json({
+			if (err) next(err);
+			
+			res.json({
 					debt: saved,
 					message: 'Debt sucessfully updated!' });
 
@@ -75,23 +73,22 @@ exports.update = function(req, res) {
 
 //DELETE '/debts/:debt_id'
 //Used to delete a debt
-exports.delete = function(req, res) {
+exports.delete = function(req, res, next) {
 	Debt.remove({ _id: req.params.debt_id }, function(err, debt) {
 		
-		if (err)
-			res.status(400).send(err);
-		else
-			res.json({ message: 'Debt sucessfully deleted!' });
+		if (err) next(err);
+		
+		res.json({ message: 'Debt sucessfully deleted!' });
 	});
 };
 
 
 //POST 'debts/:payment_id/add'
 //Used to add a debt to DB from a payment
-exports.addFromPayment = function(req, res) {
+exports.addFromPayment = function(req, res, next) {
 
 	Payment.findById(req.params.payment_id, function(err, payment) {
-		if (err) res.send(err);
+		if (err) next(err);
 
 		if (payment.debt_added == false) {
 
@@ -116,7 +113,7 @@ exports.addFromPayment = function(req, res) {
 			debt.forEach(function (d) {
 
 				d.save(function(err) {
-					if (err) res.send(err);
+					if (err) next(err);
 					console.log('Debt sucessfully created!');
 				});
 
@@ -124,7 +121,7 @@ exports.addFromPayment = function(req, res) {
 
 			payment.debt_added = true;
 			payment.save(function(err) {
-				if (err) res.send(err);
+				if (err) next(err);
 				console.log('Payment sucessfully updated!');
 			});
 
