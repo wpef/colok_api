@@ -5,10 +5,26 @@ var Debt	= require('../models/debt');
 //Used to list all the payments
 exports.list_all = function(req,res) {
 
-	Payment.find(function(err, payments) {
+	Payment.find(function(err, docs) {
 			if (err) next(err);
 			
-			res.json(payments);
+		
+		var response = {
+			count : docs.length,
+			payments : docs.map(payment => {
+
+				return {
+					_id : payment._id,
+					name : payment.name,
+					debts : payment.debts,
+					payments : payment.payments,
+					url : 'http://localhost/api/payments/' + payment._id
+				}
+			})
+		}
+
+		res.json( response );
+
 	});
 };
 
@@ -25,10 +41,20 @@ exports.add = function(req,res) {
 
 
 	// save the payment and check for errors
-	payment.save(function(err) {
+	payment.save(function(err, payment) {
 		if (err) next(err);
 		
-		res.json({ message: 'Payment sucessfully created!' });
+		var response = {
+			payment : {
+				_id : payment._id,
+				name : payment.name,
+				debts : payment.debts,
+				payments : payment.payments,
+				url : 'http://localhost/api/payments/' + payment._id
+			}
+		}
+
+		res.json( response );
 	});
 };
 
@@ -60,7 +86,7 @@ exports.update = function(req, res, next) {
 		if (err) next(err);
 		res.json({
 				op : updated,
-				message : 'Colok sucessfully updated!' });
+				message : 'Payment sucessfully updated!' });
 	});
 
 };

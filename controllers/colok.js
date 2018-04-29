@@ -7,10 +7,22 @@ var Colok	= require('../models/colok');
 //Used to list all coloks
 exports.list_all = function(req,res, next) {
 
-	Colok.find(function(err, coloks) {
+	Colok.find().select('_id name debts payments').exec(function(err, docs) {
+			var response = {
+				count  : docs.length,
+				coloks : docs.map(doc => {
+					return {
+						name : doc.name,
+						price : doc.price, 
+						_id : doc._id, 
+						url : 'http://localhost:8080/api/coloks/' + doc._id
+					};
+				})
+			};
+
 			if (err) next(err);
 			
-			res.json(coloks);
+			res.json( response );
 	});
 };
 
@@ -27,8 +39,17 @@ exports.add = function(req,res, next) {
 	// save the colok and check for errors
 	colok.save(function(err, saved) {
 		if (err) next(err);
+
+		var response = {
+			message : 'Colok sucessfully created!',
+			colok : {
+				_id : colok._id,
+				name : colok.name,
+				url : 'http://localhost:8080/api/coloks/' + colok._id
+			}
+		};
 		
-		res.json({ colok : saved, message: 'Colok sucessfully created!' });
+		res.json( response );
 	});
 };
 
@@ -41,7 +62,17 @@ exports.getBy_id = function(req, res, next) {
 	})
 	.populate('debts').populate('payments').exec(function (err, populated) {
 		if (err) next(err);
-		res.json({ colok : populated });
+
+		var response = {
+			colok : {
+				_id : populated._id,
+				name : populated.name,
+				debts : populated.debts,
+				payments : populated.payments,
+				url : 'http://localhost/api/coloks/' + populated._id
+			}
+		}
+		res.json( response );
 	});
 };
 
