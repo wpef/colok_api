@@ -7,7 +7,6 @@ exports.list_all = function(req,res) {
 
 	Payment.find(function(err, docs) {
 			if (err) next(err);
-			
 		
 		var response = {
 			count : docs.length,
@@ -44,7 +43,15 @@ exports.add = function(req,res, next) {
 	payment.save(function(err, payment) {
 		if (err) next(err);
 
-		var debts = payment.calc_debts();
+		var newDebts = payment.calc_debts();
+		var savedDebts = [];
+
+		newDebts.debts.forEach((debt => {
+			debt.save(function (err, saved) {
+				if (err) next(err);
+			});
+
+		}));
 
 		var response = {
 			payment : {
@@ -53,7 +60,7 @@ exports.add = function(req,res, next) {
 				price : payment.price,
 				owner : payment.owner,
 				sharers : payment.sharers,
-				debts : debts,
+				debts : newDebts,
 				effectif : payment.sharers.length,
 				url : 'http://localhost:8080/api/payments/' + payment._id
 			}

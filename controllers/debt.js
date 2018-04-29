@@ -1,15 +1,35 @@
 var Payment = require('../models/payment');
 var Debt	= require('../models/debt');
 
-
 //GET '/debts/'
 //Used to list all debts
 exports.list_all = function(req,res, next) {
 
-	Debt.find(function(err, debts) {
-			if (err) next(err);
-			
-			res.json(debts);
+	Debt
+	.find()
+	.populate('from')
+	.populate('to')
+	.exec()
+	.then( function(debts) {
+
+		var response = {
+			count : debts.length,
+			debts : debts.map( (debt) => {
+				
+				return {
+					id : debt._id,
+					from : debt.from.name,
+					to : debt.to.name,
+					price : debt.price,
+					url : 'http://localhost:8080/api/debts/' + debt._id
+				}
+			})
+		}
+
+		res.json( response );
+	})
+	.catch((error) => {
+		next(error);
 	});
 };
 
@@ -42,7 +62,16 @@ exports.getBy_id = function(req, res, next) {
 	.populate('from').populate('to').exec(function (err, populated) {
 		if (err) next(err);
 		
-		res.json({ debt : populated });
+		var response = {
+			id : populated._id,
+			from : populated.from.name,
+			price : populated.price,
+			to : populated.to.name,
+			url : 'http://localhost:8080/api/debts/' + populated._id
+		}
+
+
+		res.json( response );
 	});
 };
 
