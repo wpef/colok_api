@@ -45,7 +45,6 @@ exports.add = function(req,res, next) {
 		if (err) next(err);
 
 		var debts = payment.calc_debts();
-		console.log(debts);
 
 		var response = {
 			payment : {

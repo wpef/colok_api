@@ -24,7 +24,7 @@ PaymentSchema.methods.calc_debts = function() {
 
 	this.sharers.forEach(function (s) {
 
-		if (s == this.owner) {
+		if (String(s) == String(this.owner)) {
 			total = total - shared; 
 		}
 		else {
@@ -38,9 +38,9 @@ PaymentSchema.methods.calc_debts = function() {
 			}));
 		}
 
-	});
+	}, this );
 
-	return ({ total : this.price, "Dettes" : debts, reste : total });
+	return ({ count : debts.length, debts, reste : total });
 };
 
 PaymentSchema.methods.myfunction= function(param) {
