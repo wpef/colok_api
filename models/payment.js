@@ -1,5 +1,6 @@
 var mongoose     = require('mongoose');
 var Schema       = mongoose.Schema;
+var Debt		 = require('./debt.js');
 
 var PaymentSchema   = new Schema({
     name	: {type : String, required : true},
@@ -13,6 +14,34 @@ var PaymentSchema   = new Schema({
 PaymentSchema.virtual('n').get(function () {
   return this.sharers.length;
 });
+
+PaymentSchema.methods.calc_debts = function() {
+
+	var total = this.price;
+	var shared = total / this.sharers.length;
+
+	var debts = [];
+
+	this.sharers.forEach(function (s) {
+
+		if (s == this.owner) {
+			total = total - shared; 
+		}
+		else {
+
+			total = total - shared; 
+
+			debts.push( new Debt({
+				from	: s,
+				price	: shared,
+				to		: this.owner,
+			}));
+		}
+
+	});
+
+	return ({ total : this.price, "Dettes" : debts, reste : total });
+};
 
 PaymentSchema.methods.myfunction= function(param) {
  		//anything

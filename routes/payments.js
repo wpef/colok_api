@@ -12,7 +12,4 @@ router.route('/:payment_id')
     .patch(paymentControl.update)
     .delete(paymentControl.delete);
 
-router.route('/:payment_id/debt')
-	.get(paymentControl.calc_debt);
-
 module.exports = router;
