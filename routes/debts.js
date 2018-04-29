@@ -12,7 +12,7 @@ router.route('/')
 
 router.route('/:debt_id')
     .get(debtControl.getBy_id)
-    .put(debtControl.update)
+    .patch(debtControl.update)
     .delete(debtControl.delete);
 
 

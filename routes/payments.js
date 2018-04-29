@@ -9,7 +9,7 @@ router.route('/')
 
 router.route('/:payment_id')
     .get(paymentControl.getBy_id)
-    .put(paymentControl.update)
+    .patch(paymentControl.update)
     .delete(paymentControl.delete);
 
 router.route('/:payment_id/debt')

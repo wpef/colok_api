@@ -47,28 +47,22 @@ exports.getBy_id = function(req, res) {
 //PUT '/payment/:payment_id'
 //Use to update a payment
 //vars : String name / Number price/ String owner/ Array sharers 
-exports.update = function(req, res) {
+exports.update = function(req, res, next) {
 
-	Payment.findById(req.params.payment_id, function(err, payment) {
+	var id			= req.params.payment_id;
+	var updateOps	= {};
+	
+	for (var ops of req.body) {
+		updateOps[ops.propName] = ops.value;
+	}
+
+	Payment.update({ _id : id }, {$set : updateOps }, function (err, updated) {
 		if (err) next(err);
-
-		var body = req.body;
-
-		payment.name = body.name ? body.name : payment.name;
-		payment.price = body.price ? body.price : payment.price;
-		payment.owner = body.owner ? body.owner : payment.owner;
-		payment.sharers = body.sharers ? body.sharers : payment.sharers;
-
-		payment.save(function (err) {
-			if (err) next(err);
-			
-			res.json({
-				payment_id: payment._id,
-				payment_name : payment.name,
-				message: 'Payment sucessfully updated!' });
-
-		});
+		res.json({
+				op : updated,
+				message : 'Colok sucessfully updated!' });
 	});
+
 };
 
 //DELETE '/payment/:payment_id'

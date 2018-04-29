@@ -12,7 +12,7 @@ router.route('/')
 
 router.route('/:colok_id')
     .get(colokControl.getBy_id)
-    .put(colokControl.update)
+    .patch(colokControl.update)
     .delete(colokControl.delete);
 
 module.exports = router;

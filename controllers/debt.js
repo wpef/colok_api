@@ -50,26 +50,22 @@ exports.getBy_id = function(req, res, next) {
 //Used to update a debt
 exports.update = function(req, res, next) {
 
-	Debt.findById(req.params.debt_id, function(err, debt) {
+	var id			= req.params.debt_id;
+	var updateOps	= {};
+	
+	for (var ops of req.body) {
+		updateOps[ops.propName] = ops.value;
+	}
+
+	Debt.update({ _id : id }, {$set : updateOps }, function (err, updated) {
 		if (err) next(err);
-
-		var body = req.body;
-
-		debt.from = body.from ? body.from : debt.from;
-		debt.price = body.price ? body.price : debt.price;
-		debt.to = body.to ? body.to : debt.to;
-		debt.paid = body.paid ? body.paid : debt.paid;
-
-		debt.save(function (err, saved) {
-			if (err) next(err);
-			
-			res.json({
-					debt: saved,
-					message: 'Debt sucessfully updated!' });
-
-		});
+		res.json({
+				op : updated,
+				message : 'Debt sucessfully updated!' });
 	});
+
 };
+
 
 //DELETE '/debts/:debt_id'
 //Used to delete a debt

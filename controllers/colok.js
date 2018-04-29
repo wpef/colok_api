@@ -47,26 +47,23 @@ exports.getBy_id = function(req, res, next) {
 
 //PUT '/coloks/:colok_id'
 //Used to update a colok
+// Waits for an array
 exports.update = function(req, res, next) {
 
-	Colok.findById(req.params.colok_id, function(err, colok) {
+	var id			= req.params.colok_id;
+	var updateOps	= {};
+	
+	for (var ops of req.body) {
+		updateOps[ops.propName] = ops.value;
+	}
+
+	Colok.update({ _id : id }, {$set : updateOps }, function (err, updated) {
 		if (err) next(err);
-
-		var body = req.body;
-
-		colok.name = body.name ? body.name : colok.name;
-		colok.debts = body.debts ? body.debts : colok.debts;
-		colok.payments = body.payments ? body.payments : colok.payments;
-
-		colok.save(function (err, saved) {
-			if (err) next(err);
-			
-			res.json({
-				colok: saved,
-				message: 'Colok sucessfully updated!' });
-
-		});
+		res.json({
+				op : updated,
+				message : 'Colok sucessfully updated!' });
 	});
+
 };
 
 //DELETE '/coloks/:colok_id'
