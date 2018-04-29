@@ -69,7 +69,7 @@ exports.getBy_id = function(req, res, next) {
 				name : populated.name,
 				debts : populated.debts,
 				payments : populated.payments,
-				url : 'http://localhost/api/coloks/' + populated._id
+				url : 'http://localhost:8080/api/coloks/' + populated._id
 			}
 		}
 		res.json( response );

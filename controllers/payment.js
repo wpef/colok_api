@@ -18,7 +18,7 @@ exports.list_all = function(req,res) {
 					name : payment.name,
 					debts : payment.debts,
 					payments : payment.payments,
-					url : 'http://localhost/api/payments/' + payment._id
+					url : 'http://localhost:8080/api/payments/' + payment._id
 				}
 			})
 		}
@@ -50,7 +50,7 @@ exports.add = function(req,res) {
 				name : payment.name,
 				debts : payment.debts,
 				payments : payment.payments,
-				url : 'http://localhost/api/payments/' + payment._id
+				url : 'http://localhost:8080/api/payments/' + payment._id
 			}
 		}
 
