@@ -1,117 +1,110 @@
 var Payment = require('../models/payment');
-var Debt	= require('../models/debt');
+var Debt = require('../models/debt');
 
 //GET 'api/payment'
 //Used to list all the payments
-exports.list_all = function(req,res) {
+exports.list_all = function(req, res) {
+  Payment.find(function(err, docs) {
+    if (err) next(err);
 
-	Payment.find(function(err, docs) {
-			if (err) next(err);
-		
-		var response = {
-			count : docs.length,
-			payments : docs.map(payment => {
+    var response = {
+      count: docs.length,
+      payments: docs.map(payment => {
+        return {
+          _id: payment._id,
+          name: payment.name,
+          debts: payment.debts,
+          payments: payment.payments,
+          url: 'http://localhost:8080/api/payments/' + payment._id
+        };
+      })
+    };
 
-				return {
-					_id : payment._id,
-					name : payment.name,
-					debts : payment.debts,
-					payments : payment.payments,
-					url : 'http://localhost:8080/api/payments/' + payment._id
-				}
-			})
-		}
-
-		res.json( response );
-
-	});
+    res.json(response);
+  });
 };
 
 //POST 'api/payments'
 //Used to add a payment to the DB
-exports.add = function(req,res, next) {
+exports.add = function(req, res, next) {
+  var payment = new Payment();
+  payment.name = req.body.name;
+  payment.price = req.body.price;
+  payment.owner = req.body.owner;
+  payment.sharers = req.body.sharers.split(',');
+  payment.paid = false;
 
-	var payment 		= new Payment();
-		payment.name	= req.body.name;
-		payment.price	= req.body.price;
-		payment.owner	= req.body.owner;
-		payment.sharers	= req.body.sharers.split(',');
-		payment.paid 	= false;
+  // save the payment and check for errors
+  payment.save(function(err, payment) {
+    if (err) next(err);
 
+    var newDebts = payment.calc_debts();
+    var savedDebts = [];
 
-	// save the payment and check for errors
-	payment.save(function(err, payment) {
-		if (err) next(err);
+    newDebts.debts.forEach(debt => {
+      debt.save(function(err, saved) {
+        if (err) next(err);
+      });
+    });
 
-		var newDebts = payment.calc_debts();
-		var savedDebts = [];
+    var response = {
+      payment: {
+        _id: payment._id,
+        name: payment.name,
+        price: payment.price,
+        owner: payment.owner,
+        sharers: payment.sharers,
+        debts: newDebts,
+        effectif: payment.sharers.length,
+        url: 'http://localhost:8080/api/payments/' + payment._id
+      }
+    };
 
-		newDebts.debts.forEach((debt => {
-			debt.save(function (err, saved) {
-				if (err) next(err);
-			});
-
-		}));
-
-		var response = {
-			payment : {
-				_id : payment._id,
-				name : payment.name,
-				price : payment.price,
-				owner : payment.owner,
-				sharers : payment.sharers,
-				debts : newDebts,
-				effectif : payment.sharers.length,
-				url : 'http://localhost:8080/api/payments/' + payment._id
-			}
-		}
-
-		res.json( response );
-	});
+    res.json(response);
+  });
 };
 
 //GET 'api/payment/:payment_id'
 exports.getBy_id = function(req, res) {
-	Payment
-	.findById(req.params.payment_id, function(err, payment) {
-		if (err) next(err);
-		else if (!payment) next({status : 404, message : 'Payment not found'});
-	})
-	.populate('owner').populate('sharers').exec(function(err, populated) {
-		res.json({ payment : populated , effectif : populated.n });
-	});
+  Payment.findById(req.params.payment_id, function(err, payment) {
+    if (err) next(err);
+    else if (!payment) next({ status: 404, message: 'Payment not found' });
+  })
+    .populate('owner')
+    .populate('sharers')
+    .exec(function(err, populated) {
+      res.json({ payment: populated, effectif: populated.n });
+    });
 };
 
 //PUT '/payment/:payment_id'
 //Use to update a payment
-//vars : String name / Number price/ String owner/ Array sharers 
+//vars : String name / Number price/ String owner/ Array sharers
 exports.update = function(req, res, next) {
+  var id = req.params.payment_id;
+  var updateOps = {};
 
-	var id			= req.params.payment_id;
-	var updateOps	= {};
-	
-	for (var ops of req.body) {
-		updateOps[ops.propName] = ops.value;
-	}
+  for (var ops of req.body) {
+    updateOps[ops.propName] = ops.value;
+  }
 
-	Payment.update({ _id : id }, {$set : updateOps }, function (err, updated) {
-		if (err) next(err);
-		res.json({
-				op : updated,
-				message : 'Payment sucessfully updated!' });
-	});
-
+  Payment.update({ _id: id }, { $set: updateOps }, function(err, updated) {
+    if (err) next(err);
+    res.json({
+      op: updated,
+      message: 'Payment sucessfully updated!'
+    });
+  });
 };
 
 //DELETE '/payment/:payment_id'
 //Used to delete a payment
 exports.delete = function(req, res) {
-	Payment.remove({ _id: req.params.payment_id }, function(err, payment) {
-		
-		if (err) next(err);
-		
-		res.json({ message: 'Payment sucessfully deleted!' });
-	});
+  Payment.remove({ _id: req.params.payment_id }, function(err, payment) {
+    if (err) next(err);
+
+    res.json({ message: 'Payment sucessfully deleted!' });
+  });
 };
 
 //GET '/payment/:payment_id/debt'
