@@ -5,7 +5,7 @@ var Debt = require('../models/debt');
 //Used to list all the payments
 exports.list_all = function(req, res) {
   Payment.find(function(err, docs) {
-    if (err) next(err);
+    if (err) return next(err);
 
     var response = {
       count: docs.length,
@@ -36,14 +36,14 @@ exports.add = function(req, res, next) {
 
   // save the payment and check for errors
   payment.save(function(err, payment) {
-    if (err) next(err);
+    if (err) return next(err);
 
     var newDebts = payment.calc_debts();
     var savedDebts = [];
 
     newDebts.debts.forEach(debt => {
       debt.save(function(err, saved) {
-        if (err) next(err);
+        if (err) return next(err);
       });
     });
 
@@ -67,7 +67,7 @@ exports.add = function(req, res, next) {
 //GET 'api/payment/:payment_id'
 exports.getBy_id = function(req, res) {
   Payment.findById(req.params.payment_id, function(err, payment) {
-    if (err) next(err);
+    if (err) return next(err);
     else if (!payment) next({ status: 404, message: 'Payment not found' });
   })
     .populate('owner')
@@ -89,7 +89,7 @@ exports.update = function(req, res, next) {
   }
 
   Payment.update({ _id: id }, { $set: updateOps }, function(err, updated) {
-    if (err) next(err);
+    if (err) return next(err);
     res.json({
       op: updated,
       message: 'Payment sucessfully updated!'
@@ -101,7 +101,7 @@ exports.update = function(req, res, next) {
 //Used to delete a payment
 exports.delete = function(req, res) {
   Payment.remove({ _id: req.params.payment_id }, function(err, payment) {
-    if (err) next(err);
+    if (err) return next(err);
 
     res.json({ message: 'Payment sucessfully deleted!' });
   });

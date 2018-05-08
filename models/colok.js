@@ -4,7 +4,16 @@ var DebtSchema = require('./debt');
 var PaymentSchema = require('./payment');
 
 var ColokSchema = new Schema({
-  name: { type: String, unique: true, required: true },
+  name: { 
+  	type: String, 
+  	unique: true, 
+  	required: true 
+  },
+  email: { 
+  	type : String, 
+  	required : true,
+  	match : /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/,
+  },
   debts: [{ type: Schema.Types.ObjectId, ref: 'Debt' }],
   payments: [{ type: Schema.Types.ObjectId, ref: 'Payment' }]
 });

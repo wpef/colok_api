@@ -40,7 +40,7 @@ exports.add = function(req, res, next) {
 
   // save the debt and check for errors
   debt.save(function(err, saved) {
-    if (err) next(err);
+    if (err) return next(err);
 
     res.json({ debt: saved, message: 'Debt sucessfully created!' });
   });
@@ -49,13 +49,13 @@ exports.add = function(req, res, next) {
 //GET '/debts/:debt_id'
 exports.getBy_id = function(req, res, next) {
   Debt.findById(req.params.debt_id, function(err, debt) {
-    if (err) next(err);
+    if (err) return next(err);
     if (!debt) next({ status: 404, message: 'Debt not found' });
   })
     .populate('from')
     .populate('to')
     .exec(function(err, populated) {
-      if (err) next(err);
+      if (err) return next(err);
 
       var response = {
         id: populated._id,
@@ -80,7 +80,7 @@ exports.update = function(req, res, next) {
   }
 
   Debt.update({ _id: id }, { $set: updateOps }, function(err, updated) {
-    if (err) next(err);
+    if (err) return next(err);
     res.json({
       op: updated,
       message: 'Debt sucessfully updated!'
@@ -92,7 +92,7 @@ exports.update = function(req, res, next) {
 //Used to delete a debt
 exports.delete = function(req, res, next) {
   Debt.remove({ _id: req.params.debt_id }, function(err, debt) {
-    if (err) next(err);
+    if (err) return next(err);
 
     res.json({ message: 'Debt sucessfully deleted!' });
   });
@@ -102,7 +102,7 @@ exports.delete = function(req, res, next) {
 //Used to add a debt to DB from a payment
 exports.addFromPayment = function(req, res, next) {
   Payment.findById(req.params.payment_id, function(err, payment) {
-    if (err) next(err);
+    if (err) return next(err);
 
     if (payment.debt_added == false) {
       var total = payment.price;
@@ -124,14 +124,14 @@ exports.addFromPayment = function(req, res, next) {
 
       debt.forEach(function(d) {
         d.save(function(err) {
-          if (err) next(err);
+          if (err) return next(err);
           console.log('Debt sucessfully created!');
         });
       });
 
       payment.debt_added = true;
       payment.save(function(err) {
-        if (err) next(err);
+        if (err) return next(err);
         console.log('Payment sucessfully updated!');
       });
 

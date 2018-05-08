@@ -20,7 +20,7 @@ exports.list_all = function(req, res, next) {
         })
       };
 
-      if (err) next(err);
+      if (err) return next(err);
 
       res.json(response);
     });
@@ -31,12 +31,13 @@ exports.list_all = function(req, res, next) {
 exports.add = function(req, res, next) {
   var colok = new Colok();
   colok.name = req.body.name;
+  colok.email = req.body.email;
   colok.debts = [];
   colok.payments = [];
 
   // save the colok and check for errors
   colok.save(function(err, saved) {
-    if (err) next(err);
+    if (err) return next(err);
 
     var response = {
       message: 'Colok sucessfully created!',
@@ -54,13 +55,13 @@ exports.add = function(req, res, next) {
 //GET '/coloks/:colok_id'
 exports.getBy_id = function(req, res, next) {
   Colok.findById(req.params.colok_id, function(err, colok) {
-    if (err) next(err);
+    if (err) return next(err);
     if (!colok) next({ status: 404, message: 'Colok not found' });
   })
     .populate('debts')
     .populate('payments')
     .exec(function(err, populated) {
-      if (err) next(err);
+      if (err) return next(err);
 
       var response = {
         colok: {
@@ -87,7 +88,7 @@ exports.update = function(req, res, next) {
   }
 
   Colok.update({ _id: id }, { $set: updateOps }, function(err, updated) {
-    if (err) next(err);
+    if (err) return next(err);
     res.json({
       op: updated,
       message: 'Colok sucessfully updated!'
@@ -99,7 +100,7 @@ exports.update = function(req, res, next) {
 //Used to delete a colok
 exports.delete = function(req, res, next) {
   Colok.remove({ _id: req.params.colok_id }, function(err, colok) {
-    if (err) next(err);
+    if (err) return next(err);
     res.json({ message: 'Colok sucessfully deleted!' });
   });
 };
