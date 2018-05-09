@@ -13,7 +13,9 @@ var ColokSchema = new Schema({
   	type : String, 
   	required : true,
   	match : /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/,
+    unique : true,
   },
+  password : { type : String, required : true },
   debts: [{ type: Schema.Types.ObjectId, ref: 'Debt' }],
   payments: [{ type: Schema.Types.ObjectId, ref: 'Payment' }]
 });

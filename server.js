@@ -12,8 +12,8 @@ var morgan = require('morgan');
 
 //Setting up mogoDB
 mongoose.connect(
-  //'mongodb://colok:mal128@ds155299.mlab.com:55299/colok',
-  'mongodb://colok:mal128@ds255329.mlab.com:55329/colok_user',
+  'mongodb://colok:mal128@ds155299.mlab.com:55299/colok',
+  //'mongodb://colok:mal128@ds255329.mlab.com:55329/colok_user',
   function(error) {
     if (error) console.log(error);
   }
