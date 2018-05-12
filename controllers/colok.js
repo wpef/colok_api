@@ -36,7 +36,7 @@ exports.add = function(req, res, next) {
     var colok = new Colok();
     colok.name = req.body.name;
     colok.email = req.body.email;
-    colok.password = hash;
+    colok.password = req.body.password ? hash : '';
     colok.debts = [];
     colok.payments = [];
 
