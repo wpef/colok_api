@@ -26,36 +26,31 @@ exports.list_all = function(req, res) {
 
 //POST 'api/payments'
 //Used to add a payment to the DB
-//Payment.sharers can be array or string splitted with ','
 exports.add = function(req, res, next) {
 
   //Check body
   let bodyErr = {};
-  if (!req.body.name) {
+  if (!req.body.name || req.body.name.length === 0 ) {
     bodyErr.message = 'Please provide a name';
     bodyErr.error = 'payment name';
   }
-  else if (!req.body.price) {
+  else if (!req.body.price || req.body.price === 0) {
     bodyErr.message = 'Please provide a value';
     bodyErr.error = 'payment value';
   }
-  else if (!req.body.sharers) {
+  else if (!req.body.sharers || req.body.sharers.length === 0) {
     bodyErr.message = 'Please provide at least one sharer';
     bodyErr.error = 'payment sharers';
   }
 
-  if (bodyErr) return next(bodyErr);
+  if (bodyErr.message) return next(bodyErr);
 
   const payment = new Payment();
         payment.name = req.body.name;
         payment.price = req.body.price;
         payment.owner = req.body.owner;
         payment.paid = false;
-
-  if (Array.isArray(payment.sharers))
-    payment.sharers = req.body.sharers;
-  else
-    payment.sharers = req.body.sharers.split(',');
+        payment.sharers = req.body.sharers;
 
   // save the payment and check for errors
   payment.save(function(err, payment) {
