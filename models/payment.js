@@ -16,23 +16,27 @@ PaymentSchema.virtual('n').get(function() {
 });
 
 PaymentSchema.methods.calc_debts = function() {
-  var total = this.price;
-  var shared = total / this.sharers.length;
-
+  
+  let total = this.price;
+  let reste = total % this.sharers.length;
+  let toShare = total - reste;
+  
+  let shared = toShare / this.sharers.length; 
   var debts = [];
 
   this.sharers.forEach(function(s) {
-    if (String(s) == String(this.owner)) {
-      total = total - shared;
-    } else {
-      total = total - shared;
+    total = total - shared;
+
+    if (String(s) !== String(this.owner)) {
 
       debts.push(
+
         new Debt({
           from: s,
           price: shared,
           to: this.owner
         })
+
       );
     }
   }, this);
