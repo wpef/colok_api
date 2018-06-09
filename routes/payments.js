@@ -14,4 +14,8 @@ router
   .patch(paymentControl.update)
   .delete(paymentControl.delete);
 
+router
+  .route('/debug')
+  .post(paymentControl.debug);
+
 module.exports = router;

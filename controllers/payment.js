@@ -125,5 +125,16 @@ exports.delete = function(req, res) {
   });
 };
 
-//GET '/payment/:payment_id/debt'
-//Used to calculate the debts  from a payment (does not store the debt)
+//POST '/payment/debug'
+exports.debug = (req, res) => {
+  let b = new Payment();
+        b.name = req.body.name;
+        b.price = req.body.price;
+        b.owner = req.body.owner;
+        b.paid = false;
+        b.sharers = req.body.sharers;
+
+  let d = b.calc_debts();
+  res.json({d});
+
+};
