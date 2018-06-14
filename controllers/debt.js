@@ -49,20 +49,14 @@ exports.add = function(req, res, next) {
 //GET '/debts/:debt_id'
 exports.getBy_id = function(req, res, next) {
   Debt.findById(req.params.debt_id, function(err, debt) {
-    if (err) return next(err);
-    if (!debt) next({ status: 404, message: 'Debt not found' });
-  })
-    .populate('from')
-    .populate('to')
-    .exec(function(err, populated) {
       if (err) return next(err);
+      if (!debt) {
+      return next({ status: 404, message: 'Debt not found' });
+    }
 
       var response = {
-        id: populated._id,
-        from: populated.from._id,
-        price: populated.price,
-        to: populated.to._id,
-        url: 'http://localhost:8080/api/debts/' + populated._id
+        debt,
+        url: 'http://localhost:8080/api/debts/' + debt._id
       };
 
       res.json(response);
@@ -106,9 +100,28 @@ exports.getFromUser = function(req, res, next) {
   Debt
     .find(q, function (err, debts) {
       if (err) return next(err);
-      if (!debts) next({ status: 404, message: 'Debt not found' });
-    })
-    .exec( (err, debts) => { res.json(debts); } );
+      if (!debts) return next({ status: 404, message: 'No debts found for this user' });
+
+      res.json(debts);
+
+    });
+
+};
+
+exports.getToUser = function(req, res, next) {
+  let user = req.params.user;
+
+  let q = { to : user };
+  
+  Debt
+    .find(q, function (err, debts) {
+      if (err) return next(err);
+      if (!debts || debts.length === 0)
+        return next({ status: 404, message: 'No debts found for this user' });
+
+      res.json(debts);
+
+    });
 
 };
 

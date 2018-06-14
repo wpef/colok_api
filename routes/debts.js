@@ -22,6 +22,10 @@ router
 	.get(debtControl.getFromUser);
 
 router
+	.route('/to/:user')
+	.get(debtControl.getToUser);
+
+router
 	.route('/:payment_id/add')
 	.post(debtControl.addFromPayment);
 
