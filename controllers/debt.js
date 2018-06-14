@@ -59,9 +59,9 @@ exports.getBy_id = function(req, res, next) {
 
       var response = {
         id: populated._id,
-        from: populated.from.name,
+        from: populated.from._id,
         price: populated.price,
-        to: populated.to.name,
+        to: populated.to._id,
         url: 'http://localhost:8080/api/debts/' + populated._id
       };
 
@@ -96,6 +96,20 @@ exports.delete = function(req, res, next) {
 
     res.json({ message: 'Debt sucessfully deleted!' });
   });
+};
+
+exports.getFromUser = function(req, res, next) {
+  let user = req.params.user;
+
+  let q = { from : user };
+  
+  Debt
+    .find(q, function (err, debts) {
+      if (err) return next(err);
+      if (!debts) next({ status: 404, message: 'Debt not found' });
+    })
+    .exec( (err, debts) => { res.json(debts); } );
+
 };
 
 //POST 'debts/:payment_id/add'

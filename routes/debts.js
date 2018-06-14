@@ -17,6 +17,12 @@ router
   .patch(debtControl.update)
   .delete(debtControl.delete);
 
-router.route('/:payment_id/add').post(debtControl.addFromPayment);
+router
+	.route('/from/:user')
+	.get(debtControl.getFromUser);
+
+router
+	.route('/:payment_id/add')
+	.post(debtControl.addFromPayment);
 
 module.exports = router;
