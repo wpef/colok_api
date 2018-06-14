@@ -102,7 +102,18 @@ exports.getFromUser = function(req, res, next) {
       if (err) return next(err);
       if (!debts) return next({ status: 404, message: 'No debts found for this user' });
 
-      res.json(debts);
+      //calculate total
+      let total = 0;
+      debts.forEach((debt) => {
+        total = total + debt.price;
+      });
+
+      let response = {
+        total : total,
+        debts,
+      };
+
+      res.json(response);
 
     });
 
@@ -119,7 +130,18 @@ exports.getToUser = function(req, res, next) {
       if (!debts || debts.length === 0)
         return next({ status: 404, message: 'No debts found for this user' });
 
-      res.json(debts);
+      //calculate total
+      let total = 0;
+      debts.forEach((debt) => {
+        total = total + debt.price;
+      });
+
+      let response = {
+        total : total,
+        debts,
+      };
+
+      res.json(response);
 
     });
 
