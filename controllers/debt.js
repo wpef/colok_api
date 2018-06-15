@@ -1,12 +1,12 @@
-var Payment = require('../models/payment');
-var Debt = require('../models/debt');
+var Payment = require("../models/payment");
+var Debt = require("../models/debt");
 
 //GET '/debts/'
 //Used to list all debts
 exports.list_all = function(req, res, next) {
   Debt.find()
-    .populate('from')
-    .populate('to')
+    .populate("from")
+    .populate("to")
     .exec()
     .then(function(debts) {
       var response = {
@@ -17,7 +17,7 @@ exports.list_all = function(req, res, next) {
             from: debt.from.name,
             to: debt.to.name,
             price: debt.price,
-            url: 'http://localhost:8080/api/debts/' + debt._id
+            url: "http://localhost:8080/api/debts/" + debt._id
           };
         })
       };
@@ -42,25 +42,25 @@ exports.add = function(req, res, next) {
   debt.save(function(err, saved) {
     if (err) return next(err);
 
-    res.json({ debt: saved, message: 'Debt sucessfully created!' });
+    res.json({ debt: saved, message: "Debt sucessfully created!" });
   });
 };
 
 //GET '/debts/:debt_id'
 exports.getBy_id = function(req, res, next) {
   Debt.findById(req.params.debt_id, function(err, debt) {
-      if (err) return next(err);
-      if (!debt) {
-      return next({ status: 404, message: 'Debt not found' });
+    if (err) return next(err);
+    if (!debt) {
+      return next({ status: 404, message: "Debt not found" });
     }
 
-      var response = {
-        debt,
-        url: 'http://localhost:8080/api/debts/' + debt._id
-      };
+    var response = {
+      debt,
+      url: "http://localhost:8080/api/debts/" + debt._id
+    };
 
-      res.json(response);
-    });
+    res.json(response);
+  });
 };
 
 //PUT '/debts/:debt_id'
@@ -77,7 +77,7 @@ exports.update = function(req, res, next) {
     if (err) return next(err);
     res.json({
       op: updated,
-      message: 'Debt sucessfully updated!'
+      message: "Debt sucessfully updated!"
     });
   });
 };
@@ -88,120 +88,116 @@ exports.delete = function(req, res, next) {
   Debt.remove({ _id: req.params.debt_id }, function(err, debt) {
     if (err) return next(err);
 
-    res.json({ message: 'Debt sucessfully deleted!' });
+    res.json({ message: "Debt sucessfully deleted!" });
   });
 };
 
 exports.getFromUser = function(req, res, next) {
   let user = req.params.user;
 
-  let q = { from : user };
-  
-  Debt
-    .find(q, function (err, debts) {
-      if (err) return next(err);
-      if (!debts) return next({ status: 404, message: 'No debts found for this user' });
+  let q = { from: user };
 
-      //calculate total
-      let total = 0;
-      debts.forEach((debt) => {
-        total = total + debt.price;
-      });
+  Debt.find(q, function(err, debts) {
+    if (err) return next(err);
+    if (!debts)
+      return next({ status: 404, message: "No debts found for this user" });
 
-      let response = {
-        total : total,
-        debts,
-      };
-
-      res.json(response);
-
+    //calculate total
+    let total = 0;
+    debts.forEach(debt => {
+      total = total + debt.price;
     });
 
+    let response = {
+      total: total,
+      debts
+    };
+
+    res.json(response);
+  });
 };
 
 exports.getToUser = function(req, res, next) {
   let user = req.params.user;
 
-  let q = { to : user };
-  
-  Debt
-    .find(q, function (err, debts) {
-      if (err) return next(err);
-      if (!debts || debts.length === 0)
-        return next({ status: 404, message: 'No debts found for this user' });
+  let q = { to: user };
 
-      //calculate total
-      let total = 0;
-      debts.forEach((debt) => {
-        total = total + debt.price;
-      });
+  Debt.find(q, function(err, debts) {
+    if (err) return next(err);
+    if (!debts || debts.length === 0)
+      return next({ status: 404, message: "No debts found for this user" });
 
-      let response = {
-        total : total,
-        debts,
-      };
-
-      res.json(response);
-
+    //calculate total
+    let total = 0;
+    debts.forEach(debt => {
+      total = total + debt.price;
     });
 
+    let response = {
+      total: total,
+      debts
+    };
+
+    res.json(response);
+  });
 };
 
 exports.getForUser = function(req, res, next) {
   let user = req.params.user;
-  
-  Debt
-    .find()
-    .or([{ from: user }, { to: user }])
-    .exec( function (err, debts) {
-      if (err) return next(err);
-      if (!debts) return next({ status: 404, message: 'No debts found for this user' });
 
-      //calculate total
-      let total = 0;
-      let result = {
-        debtsArray : {
-          toGet : [],
-          toGive : [], 
-        },
-        debtsTotal : {
-          toGet : [
-          ],
-          toGive : [
-          ],
+  Debt.find()
+    .or([{ from: user }, { to: user }])
+    .exec(function(err, debts) {
+      if (err) return next(err);
+      if (!debts)
+        return next({ status: 404, message: "No debts found for this user" });
+
+      //calculate balances
+      let debtsAr = [];
+
+      debts.forEach(d => {
+
+        let debt = { from : String(d.from), price : d.price, to : String(d.to) };
+
+        if (debt.from === user) { //less for user
+
+          if ( !debtsAr[debt.to] ) {
+            debtsAr[debt.to] = { colok: debt.to, total: -1 * debt.price };
+          } else {  
+            let newPrice = debtsAr[debt.to]['total'] - debt.price ;
+            debtsAr[debt.to] = { colok: debt.to, total: newPrice };
+          };
+
+        } else if (debt.to === user) { //more for user
+
+          if ( !debtsAr[debt.from] ) {
+            debtsAr[debt.from] = { colok: debt.from, total: debt.price };
+          } else { 
+            let newPrice = debtsAr[debt.from]['total'] + debt.price ;
+            debtsAr[debt.from] = { colok: debt.from, total: newPrice };
+          };
+
         }
+      });
+
+
+      const result = [];
+      let total = 0;
+
+      for (i in debtsAr) {
+        let count = debtsAr[i];
+        total = total + count.total;
+        result.push(count);
       }
 
-      let debtsArray = result.debtsArray;
-
-      debts.forEach((debt) => {
-        if (debt.from == user) {
-          debtsArray.toGive.push({ debt: debt, to : debt.to, price : debt.price });
-        } else if (debt.to == user ) {
-          debtsArray.toGet.push({ from : debt.from, price : debt.price });
-        }
-      });
-
-      const to = [];
-      debtsArray.toGive.forEach((debt) => {
-
-          to[debt.to] = to[debt.to] ? to[debt.to] + debt.price : debt.price;
-
-      });
-
-      console.log(to);
-      result.debtsTotal = { toGive : to };
-
       let response = {
-        user : user,
-        result : result,
+        result,
+        total,
         //debts,
       };
 
       res.json(response);
-
     });
-
 };
 
 //POST 'debts/:payment_id/add'
@@ -231,17 +227,17 @@ exports.addFromPayment = function(req, res, next) {
       debt.forEach(function(d) {
         d.save(function(err) {
           if (err) return next(err);
-          console.log('Debt sucessfully created!');
+          console.log("Debt sucessfully created!");
         });
       });
 
       payment.debt_added = true;
       payment.save(function(err) {
         if (err) return next(err);
-        console.log('Payment sucessfully updated!');
+        console.log("Payment sucessfully updated!");
       });
 
-      res.json({ Total: payment.price, 'Debts created': debt });
-    } else res.json({ message: 'Debts already posted' });
+      res.json({ Total: payment.price, "Debts created": debt });
+    } else res.json({ message: "Debts already posted" });
   });
 };
