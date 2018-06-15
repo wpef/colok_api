@@ -164,19 +164,33 @@ exports.getForUser = function(req, res, next) {
           toGet : [],
           toGive : [], 
         },
+        debtsTotal : {
+          toGet : [
+          ],
+          toGive : [
+          ],
+        }
       }
 
       let debtsArray = result.debtsArray;
 
       debts.forEach((debt) => {
         if (debt.from == user) {
-          debtsArray.toGive.push({ from : debt.from, price : debt.price });
+          debtsArray.toGive.push({ debt: debt, to : debt.to, price : debt.price });
         } else if (debt.to == user ) {
           debtsArray.toGet.push({ from : debt.from, price : debt.price });
         }
       });
 
-      
+      const to = [];
+      debtsArray.toGive.forEach((debt) => {
+
+          to[debt.to] = to[debt.to] ? to[debt.to] + debt.price : debt.price;
+
+      });
+
+      console.log(to);
+      result.debtsTotal = { toGive : to };
 
       let response = {
         user : user,
