@@ -149,22 +149,22 @@ exports.getToUser = function(req, res, next) {
 
 exports.getForUser = function(req, res, next) {
   let user = req.params.user;
-
-  let q = { from : user };
   
   Debt
-    .find(q, function (err, debts) {
+    .find()
+    .or([{ from: user }, { to: user }])
+    .exec( function (err, debts) {
       if (err) return next(err);
       if (!debts) return next({ status: 404, message: 'No debts found for this user' });
 
       //calculate total
-      let total = 0;
-      debts.forEach((debt) => {
-        total = total + debt.price;
-      });
+      // let total = 0;
+      // debts.forEach((debt) => {
+      //   total = total + debt.price;
+      // });
 
       let response = {
-        total : total,
+        //total : total,
         debts,
       };
 
