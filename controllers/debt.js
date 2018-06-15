@@ -158,14 +158,30 @@ exports.getForUser = function(req, res, next) {
       if (!debts) return next({ status: 404, message: 'No debts found for this user' });
 
       //calculate total
-      // let total = 0;
-      // debts.forEach((debt) => {
-      //   total = total + debt.price;
-      // });
+      let total = 0;
+      let result = {
+        debtsArray : {
+          toGet : [],
+          toGive : [], 
+        },
+      }
+
+      let debtsArray = result.debtsArray;
+
+      debts.forEach((debt) => {
+        if (debt.from == user) {
+          debtsArray.toGive.push({ from : debt.from, price : debt.price });
+        } else if (debt.to == user ) {
+          debtsArray.toGet.push({ from : debt.from, price : debt.price });
+        }
+      });
+
+      
 
       let response = {
-        //total : total,
-        debts,
+        user : user,
+        result : result,
+        //debts,
       };
 
       res.json(response);
