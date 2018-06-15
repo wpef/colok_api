@@ -147,6 +147,33 @@ exports.getToUser = function(req, res, next) {
 
 };
 
+exports.getForUser = function(req, res, next) {
+  let user = req.params.user;
+
+  let q = { from : user };
+  
+  Debt
+    .find(q, function (err, debts) {
+      if (err) return next(err);
+      if (!debts) return next({ status: 404, message: 'No debts found for this user' });
+
+      //calculate total
+      let total = 0;
+      debts.forEach((debt) => {
+        total = total + debt.price;
+      });
+
+      let response = {
+        total : total,
+        debts,
+      };
+
+      res.json(response);
+
+    });
+
+};
+
 //POST 'debts/:payment_id/add'
 //Used to add a debt to DB from a payment
 exports.addFromPayment = function(req, res, next) {

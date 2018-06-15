@@ -18,15 +18,19 @@ router
   .delete(debtControl.delete);
 
 router
+  .route('/:payment_id/add')
+  .post(debtControl.addFromPayment);
+
+router
+  .route('/for/:user')
+  .get(debtControl.getForUser);
+
+router
 	.route('/from/:user')
 	.get(debtControl.getFromUser);
 
 router
 	.route('/to/:user')
 	.get(debtControl.getToUser);
-
-router
-	.route('/:payment_id/add')
-	.post(debtControl.addFromPayment);
 
 module.exports = router;
