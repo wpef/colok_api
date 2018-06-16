@@ -154,7 +154,6 @@ exports.getForUser = function(req, res, next) {
 
       //calculate balances
       let debtsAr = [];
-      console.log(user);
 
       debts.forEach(d => {
 
@@ -165,7 +164,7 @@ exports.getForUser = function(req, res, next) {
           if ( !debtsAr[debt.to] ) {
             debtsAr[debt.to] = { colok: debt.to, total: -1 * debt.price };
           } else {  
-            let newPrice = debtsAr[debt.to]['total'] + debt.price ;
+            let newPrice = debtsAr[debt.to]['total'] + -1 * debt.price ;
             debtsAr[debt.to] = { colok: debt.to, total: newPrice };
           };
 
