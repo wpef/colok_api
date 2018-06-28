@@ -19,7 +19,10 @@ PaymentSchema.methods.calc_debts = function() {
 
   let t = Number(this.price);
   let n = this.sharers.length;
-  let r = Math.round((t % n ) * 100) / 100;
+  let t1 =  t * 100;
+      n1 =  n * 100
+
+  let r = (Math.round((t1 % n1 ) * 100) / 100) / 100 ;
 
   let round = t / n;
   let shares = Math.round(round * 100) / 100;
