@@ -128,11 +128,11 @@ exports.delete = function(req, res) {
 //POST '/payment/debug'
 exports.debug = (req, res) => {
   let b = new Payment();
-        b.name = req.body.name;
-        b.price = req.body.price;
-        b.owner = req.body.owner;
+        b.name = 'osef';
+        b.price = 9.90;
+        b.owner = 'osef';
         b.paid = false;
-        b.sharers = req.body.sharers;
+        b.sharers = [''];
 
   let d = b.calc_debts();
   res.json({d});
