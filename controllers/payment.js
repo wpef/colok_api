@@ -130,10 +130,11 @@ exports.debug = (req, res) => {
   let b = new Payment();
         b.name = 'osef';
         b.price = 9.90;
-        b.owner = 'osef';
+        b.owner = '5af23badf1e4f906259d2e5a';
         b.paid = false;
-        b.sharers = [''];
+        b.sharers = ['5af23badf1e4f906259d2e5a', '5af71129c1839503fe3909c1'];
 
+  console.log(b);
   let d = b.calc_debts();
   res.json({d});
 
