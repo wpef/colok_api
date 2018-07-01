@@ -129,7 +129,7 @@ exports.delete = function(req, res) {
 exports.debug = (req, res) => {
   let b = new Payment();
         b.name = 'osef';
-        b.price = 9.90;
+        b.price = 11.25;
         b.owner = '5af23badf1e4f906259d2e5a';
         b.paid = false;
         b.sharers = ['5af23badf1e4f906259d2e5a', '5af71129c1839503fe3909c1' ];

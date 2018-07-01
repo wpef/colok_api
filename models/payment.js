@@ -20,9 +20,9 @@ PaymentSchema.methods.calc_debts = function() {
   let t = Number(this.price);
   let n = this.sharers.length;
 
-  let round = t / n;
-  let shares = Math.round(round * 100) / 100;
-  let r = t - Math.round((shares * n ) * 100) / 100;
+  let shares = Math.round(t / n * 100) / 100;
+  let tRounded = shares * n;
+  let reste = ((t*100) - (tRounded*100)) / 100;
 
   const debts = [];
 
@@ -39,7 +39,7 @@ PaymentSchema.methods.calc_debts = function() {
     }
   }, this);
 
-  return { count: debts.length, debts, reste: r, payment : this };
+  return { count: debts.length, debts, reste: reste };
 };
 
 PaymentSchema.methods.myfunction = function(param) {
