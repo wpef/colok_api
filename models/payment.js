@@ -21,7 +21,7 @@ PaymentSchema.methods.calc_debts = function() {
   let n = this.sharers.length;
 
   let shares = Math.round(t / n * 100) / 100;
-  let tRounded = shares * n;
+  let tRounded = ((shares * 100) * n) / 100;
   let reste = ((t*100) - (tRounded*100)) / 100;
 
   const debts = [];
